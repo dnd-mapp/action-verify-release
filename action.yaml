@@ -1,5 +1,5 @@
 name: Verify release
-description: Checks the pushed tag against package.json and CHANGELOG.md, and writes the release notes
+description: Checks the pushed release tag against package.json and CHANGELOG.md, and writes the release notes
 
 inputs:
     changelog:
@@ -32,16 +32,6 @@ runs:
           env:
               BASE_BRANCH: ${{ inputs.base-branch }}
           run: |
-              if [[ "$GITHUB_REF_TYPE" != "tag" ]]; then
-                  echo "::error::This action runs on tag pushes only, not on $GITHUB_REF_TYPE $GITHUB_REF_NAME"
-                  exit 1
-              fi
-
-              if [[ ! "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-                  echo "::error::Tag $GITHUB_REF_NAME does not match vX.Y.Z"
-                  exit 1
-              fi
-
               git fetch --no-tags --depth=200 origin "+refs/heads/$BASE_BRANCH:refs/remotes/origin/$BASE_BRANCH"
 
               if ! git merge-base --is-ancestor HEAD "origin/$BASE_BRANCH"; then

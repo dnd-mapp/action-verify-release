@@ -8,6 +8,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- The action. It checks that the workflow runs for a `vX.Y.Z` tag, asserts that the tagged commit is on the base branch, verifies the changelog with `changelog verify`, and writes the release notes with `changelog notes`. It outputs `version` and `notes-file`.
+- The action. It asserts that the tagged commit is on the base branch, verifies the changelog with `changelog verify`, and writes the release notes with `changelog notes`. It outputs `version` and `notes-file`.
 
 [Unreleased]: https://github.com/dnd-mapp/action-verify-release/commits/main

@@ -9,7 +9,7 @@ The D&D Mapp packages are released from a tag push. This action runs first, in a
 
 ## Requirements
 
-- A workflow that runs on `push` of `vX.Y.Z` tags.
+- A workflow that runs on `push` of release tags only, such as `v[0-9]+.[0-9]+.[0-9]+`. The action trusts the trigger and reads the version from the tag name without the leading `v`.
 - `@dnd-mapp/changelog-tools` as a dev dependency of the repository, installed before the action runs. The action calls `pnpm exec changelog`.
 - A checkout of the tagged commit. A shallow checkout is fine, because the action fetches the base branch itself.
 
@@ -27,10 +27,11 @@ Run it after the dependencies are installed, and upload the notes file as an art
 
 ## What it checks
 
-1. The workflow runs for a tag, and the tag matches `vX.Y.Z`.
-2. The tagged commit is reachable from `origin/<base-branch>`. This replaces the branch check that `--no-git-checks` turns off when the package is staged.
-3. `changelog verify --version X.Y.Z` passes. It checks the version against `package.json` and the section, its date, its entries, and the link references in the changelog.
-4. `changelog notes --version X.Y.Z --output <notes-file>` writes the release notes.
+1. The tagged commit is reachable from `origin/<base-branch>`. This replaces the branch check that `--no-git-checks` turns off when the package is staged.
+2. `changelog verify --version X.Y.Z` passes. It checks the version against `package.json` and the section, its date, its entries, and the link references in the changelog.
+3. `changelog notes --version X.Y.Z --output <notes-file>` writes the release notes.
+
+The action does not check the tag name itself. A tag that is not a release version fails in `changelog verify`, because the version is not valid SemVer or has no section.
 
 ## Inputs
 
