@@ -1,0 +1,67 @@
+name: Verify release
+description: Checks the pushed tag against package.json and CHANGELOG.md, and writes the release notes
+
+inputs:
+    changelog:
+        description: Path to the changelog, relative to the repository root
+        required: false
+        default: CHANGELOG.md
+    notes-file:
+        description: Path of the release notes file to write, relative to the repository root
+        required: false
+        default: release-notes.md
+    base-branch:
+        description: Branch that the tagged commit must be reachable from
+        required: false
+        default: main
+
+outputs:
+    version:
+        description: The version from the tag, without the leading v
+        value: ${{ steps.tag.outputs.version }}
+    notes-file:
+        description: Path of the release notes file that was written
+        value: ${{ inputs.notes-file }}
+
+runs:
+    using: composite
+    steps:
+        - name: Check the tag
+          id: tag
+          shell: bash
+          env:
+              BASE_BRANCH: ${{ inputs.base-branch }}
+          run: |
+              if [[ "$GITHUB_REF_TYPE" != "tag" ]]; then
+                  echo "::error::This action runs on tag pushes only, not on $GITHUB_REF_TYPE $GITHUB_REF_NAME"
+                  exit 1
+              fi
+
+              if [[ ! "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                  echo "::error::Tag $GITHUB_REF_NAME does not match vX.Y.Z"
+                  exit 1
+              fi
+
+              git fetch --no-tags --depth=200 origin "+refs/heads/$BASE_BRANCH:refs/remotes/origin/$BASE_BRANCH"
+
+              if ! git merge-base --is-ancestor HEAD "origin/$BASE_BRANCH"; then
+                  echo "::error::The tagged commit $(git rev-parse HEAD) is not on $BASE_BRANCH"
+                  exit 1
+              fi
+
+              echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+        - name: Verify the changelog
+          shell: bash
+          env:
+              VERSION: ${{ steps.tag.outputs.version }}
+              CHANGELOG: ${{ inputs.changelog }}
+          run: pnpm exec changelog verify --version "$VERSION" --file "$CHANGELOG"
+
+        - name: Write the release notes
+          shell: bash
+          env:
+              VERSION: ${{ steps.tag.outputs.version }}
+              CHANGELOG: ${{ inputs.changelog }}
+              NOTES_FILE: ${{ inputs.notes-file }}
+          run: pnpm exec changelog notes --version "$VERSION" --file "$CHANGELOG" --output "$NOTES_FILE"
