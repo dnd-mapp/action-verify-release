@@ -2,13 +2,13 @@
 
 ## Project
 
-This package ships the `changelog` bin with the `verify` and `notes` commands, plus a public API from `src/index.ts`. Release workflows run it before they publish to npm and create a GitHub Release. Read `CONTRIBUTING.md` for the layout, the scripts, and the commit and branch conventions.
+This repository is the composite GitHub Action `dnd-mapp/action-verify-release`. The action in `action.yaml` checks a pushed release tag against `package.json` and `CHANGELOG.md`, and writes the release notes with the `changelog` bin from `@dnd-mapp/changelog-tools`. Read `CONTRIBUTING.md` for the layout, the checks, the release steps, and the commit and branch conventions.
 
-- Keep all file system and console access in `src/cli.ts`. The parser, the checks, and the renderer take strings and return values.
-- Treat the failure messages as a contract. When you change one, update the README table and the specs in the same commit.
-- Add a fixture to `testing/fixtures.ts` for every new situation that a check handles. Short inline snippets are fine for parser edge cases.
-- Keep the package free of runtime dependencies. Use `node:util` and other Node built-ins instead.
-- Run `format-check`, `lint-md`, `lint-ts`, `typecheck`, `test-ci`, and `build` before you commit.
+- Keep the action to its checks. Staging the package and creating the GitHub Release are plain steps in the release workflow of each package.
+- Pass inputs and step outputs into `run` scripts through `env`, and read them as shell variables. A `${{ }}` expression belongs in an `env` value, never inside the script.
+- Treat the input and output names and their defaults as a contract. When you change one, update `action.yaml`, the README tables, and the changelog in the same commit, and mark the change as breaking.
+- Pin every third-party action to a commit SHA and note the version in a comment.
+- Run `format-check`, `lint-md`, and `actionlint` before you commit.
 
 ## Writing style
 
