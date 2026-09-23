@@ -1,0 +1,13 @@
+.idea/*
+!.idea/runConfigurations/
+!.idea/markdown.xml
+!.idea/prettier.xml
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+
+node_modules/
+
+release-notes.md
