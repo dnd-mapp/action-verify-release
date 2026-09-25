@@ -108,11 +108,13 @@ jobs:
 
             - name: Stage the package
               shell: bash
-              run: pnpm stage publish --access public --provenance --tag latest --no-git-checks
+              run: pnpm stage publish --provenance --no-git-checks
 
     release:
         name: GitHub Release
-        needs: [verify, publish]
+        needs:
+            - verify
+            - publish
         runs-on: ubuntu-26.04
         timeout-minutes: 5
         permissions:
@@ -137,9 +139,10 @@ A maintainer approves the staged version afterwards with `pnpm stage approve <id
 
 - Three jobs, so the npm token and the write access to the repository each exist in one job only. Everything that can fail for a fixable reason runs in `verify`, before any side effect.
 - `--no-git-checks`, because a tag checkout is a detached HEAD and pnpm would refuse to publish. The ancestry check of this action is the stricter replacement.
+- No `--access` or `--tag`, because `publishConfig.access` in the manifest makes the package public and `latest` is the default dist-tag.
 - `environment: npm`, so the OIDC token carries an environment claim that the trust relationship pins. Protection rules can be added later without touching the workflow.
 - The GitHub Release comes after staging. A failed stage leaves no half-finished release behind, and GitHub Releases in the D&D Mapp repositories are immutable.
-- Plain steps for staging and the release, because each is one command. A composite action and not a reusable workflow for the checks, because npm trusted publishing validates the filename of the calling workflow.
+- Plain steps for staging and the release, because each is one command. The `gh` CLI comes with the runner, so no third-party action gets the token that can write to the repository. A composite action and not a reusable workflow for the checks, because npm trusted publishing validates the filename of the calling workflow.
 
 ### One-time npm setup
 
