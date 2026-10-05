@@ -42,7 +42,7 @@ The action lives in `action.yaml` at the repository root, so consumers reference
 | Path                             | Purpose                                                                                            |
 |:---------------------------------|:---------------------------------------------------------------------------------------------------|
 | `action.yaml`                    | Checks the tag and the changelog, and writes the release notes                                     |
-| `renovate.json`                  | The Renovate config of this repository, which extends the shared preset `dnd-mapp/renovate-config` |
+| `renovate.json`                  | The Renovate config of this repository, which extends the shared preset `dnd-mapp/config-renovate` |
 | `.github/actions/ci/action.yaml` | The checks that the pull request, push, and release workflows run                                  |
 | `.github/workflows/release.yaml` | Releases this repository, using the action on its own tags                                         |
 | `.github/actionlint.yaml`        | Declares the `ubuntu-26.04` runner label, which actionlint does not know yet                       |
